@@ -14,6 +14,9 @@ import AuthPage from "./pages/AuthPage";
 
 const queryClient = new QueryClient();
 
+// Check if Clerk is available
+const isClerkAvailable = Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -24,25 +27,42 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/book-table" element={<BookTable />} />
           <Route path="/restaurant/:id" element={<RestaurantDetail />} />
-          <Route path="/profile" element={
+          {isClerkAvailable ? (
+            // Clerk is available, use authentication
+            <Route path="/profile" element={
+              <>
+                <ClerkLoading>
+                  <div className="h-screen flex items-center justify-center">
+                    <div className="animate-pulse">Loading user data...</div>
+                  </div>
+                </ClerkLoading>
+                <ClerkLoaded>
+                  <SignedIn>
+                    <ProfilePage />
+                  </SignedIn>
+                  <SignedOut>
+                    <AuthPage />
+                  </SignedOut>
+                </ClerkLoaded>
+              </>
+            } />
+          ) : (
+            // Clerk is not available, show empty profile
+            <Route path="/profile" element={
+              <div className="h-screen flex flex-col items-center justify-center">
+                <div className="text-xl font-medium mb-4">Authentication Not Configured</div>
+                <p className="text-gray-600 max-w-md text-center">
+                  To enable authentication features, please add your Clerk publishable key to the environment variables.
+                </p>
+              </div>
+            } />
+          )}
+          {isClerkAvailable && (
             <>
-              <ClerkLoading>
-                <div className="h-screen flex items-center justify-center">
-                  <div className="animate-pulse">Loading user data...</div>
-                </div>
-              </ClerkLoading>
-              <ClerkLoaded>
-                <SignedIn>
-                  <ProfilePage />
-                </SignedIn>
-                <SignedOut>
-                  <AuthPage />
-                </SignedOut>
-              </ClerkLoaded>
+              <Route path="/sign-in/*" element={<AuthPage type="sign-in" />} />
+              <Route path="/sign-up/*" element={<AuthPage type="sign-up" />} />
             </>
-          } />
-          <Route path="/sign-in/*" element={<AuthPage type="sign-in" />} />
-          <Route path="/sign-up/*" element={<AuthPage type="sign-up" />} />
+          )}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
