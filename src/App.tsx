@@ -25,19 +25,21 @@ const App = () => (
           <Route path="/book-table" element={<BookTable />} />
           <Route path="/restaurant/:id" element={<RestaurantDetail />} />
           <Route path="/profile" element={
-            <ClerkLoading>
-              <div className="h-screen flex items-center justify-center">
-                <div className="animate-pulse">Loading user data...</div>
-              </div>
-            </ClerkLoading>
-            <ClerkLoaded>
-              <SignedIn>
-                <ProfilePage />
-              </SignedIn>
-              <SignedOut>
-                <AuthPage />
-              </SignedOut>
-            </ClerkLoaded>
+            <>
+              <ClerkLoading>
+                <div className="h-screen flex items-center justify-center">
+                  <div className="animate-pulse">Loading user data...</div>
+                </div>
+              </ClerkLoading>
+              <ClerkLoaded>
+                <SignedIn>
+                  <ProfilePage />
+                </SignedIn>
+                <SignedOut>
+                  <AuthPage />
+                </SignedOut>
+              </ClerkLoaded>
+            </>
           } />
           <Route path="/sign-in/*" element={<AuthPage type="sign-in" />} />
           <Route path="/sign-up/*" element={<AuthPage type="sign-up" />} />
