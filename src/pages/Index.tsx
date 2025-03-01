@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -161,7 +162,7 @@ const HomePage = () => {
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-6 md:mb-0">
-              <div className="font-serif text-lg font-medium mb-2">TableWish</div>
+              <div className="font-serif text-lg font-medium mb-2">BookATable</div>
               <p className="text-gray-500 text-sm">The best way to discover and book restaurants.</p>
             </div>
             
@@ -173,7 +174,7 @@ const HomePage = () => {
           </div>
           
           <div className="border-t border-gray-200 mt-8 pt-8 text-center text-gray-500 text-xs">
-            &copy; {new Date().getFullYear()} TableWish. All rights reserved.
+            &copy; {new Date().getFullYear()} BookATable. All rights reserved.
           </div>
         </div>
       </footer>
