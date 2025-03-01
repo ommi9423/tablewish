@@ -29,9 +29,14 @@ const NavbarLink: React.FC<{ to: string; children: React.ReactNode }> = ({ to, c
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isSignedIn, user } = useUser();
-  const { signOut } = useClerk();
   const navigate = useNavigate();
+  
+  // Check if Clerk is available
+  const isClerkAvailable = Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
+  
+  // Only use Clerk hooks if it's available
+  const user = isClerkAvailable ? useUser()?.user : null;
+  const clerk = isClerkAvailable ? useClerk() : null;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,8 +48,10 @@ const Navbar = () => {
   }, []);
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
+    if (clerk) {
+      await clerk.signOut();
+      navigate('/');
+    }
   };
 
   return (
@@ -72,45 +79,62 @@ const Navbar = () => {
 
         {/* Auth Buttons */}
         <div className="hidden md:flex items-center space-x-4">
-          <SignedIn>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="gap-2 rounded-full text-sm font-medium transition-all hover:bg-gray-100"
-              onClick={() => navigate('/profile')}
-            >
-              <User size={16} />
-              {user?.firstName || 'Profile'}
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="rounded-full text-sm font-medium transition-all hover:bg-gray-100"
-              onClick={handleSignOut}
-            >
-              Sign out
-            </Button>
-          </SignedIn>
-          <SignedOut>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="gap-2 rounded-full text-sm font-medium transition-all hover:bg-gray-100"
-              onClick={() => navigate('/sign-in')}
-            >
-              <LogIn size={16} />
-              Log in
-            </Button>
-            <Button 
-              variant="default" 
-              size="sm" 
-              className="gap-2 rounded-full bg-black text-white hover:bg-black/80 text-sm font-medium transition-all"
-              onClick={() => navigate('/sign-up')}
-            >
-              <UserPlus size={16} />
-              Sign up
-            </Button>
-          </SignedOut>
+          {isClerkAvailable ? (
+            <>
+              <SignedIn>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="gap-2 rounded-full text-sm font-medium transition-all hover:bg-gray-100"
+                  onClick={() => navigate('/profile')}
+                >
+                  <User size={16} />
+                  {user?.firstName || 'Profile'}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="rounded-full text-sm font-medium transition-all hover:bg-gray-100"
+                  onClick={handleSignOut}
+                >
+                  Sign out
+                </Button>
+              </SignedIn>
+              <SignedOut>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="gap-2 rounded-full text-sm font-medium transition-all hover:bg-gray-100"
+                  onClick={() => navigate('/sign-in')}
+                >
+                  <LogIn size={16} />
+                  Log in
+                </Button>
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  className="gap-2 rounded-full bg-black text-white hover:bg-black/80 text-sm font-medium transition-all"
+                  onClick={() => navigate('/sign-up')}
+                >
+                  <UserPlus size={16} />
+                  Sign up
+                </Button>
+              </SignedOut>
+            </>
+          ) : (
+            // Non-auth version of buttons
+            <>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="gap-2 rounded-full text-sm font-medium transition-all hover:bg-gray-100"
+                onClick={() => navigate('/profile')}
+              >
+                <User size={16} />
+                Profile
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -160,7 +184,58 @@ const Navbar = () => {
           </nav>
 
           <div className="flex flex-col space-y-3">
-            <SignedIn>
+            {isClerkAvailable ? (
+              <>
+                <SignedIn>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-center rounded-full gap-2"
+                    onClick={() => {
+                      navigate('/profile');
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <User size={16} />
+                    Profile
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-center rounded-full"
+                    onClick={() => {
+                      handleSignOut();
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    Sign out
+                  </Button>
+                </SignedIn>
+                <SignedOut>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-center rounded-full gap-2"
+                    onClick={() => {
+                      navigate('/sign-in');
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <LogIn size={16} />
+                    Log in
+                  </Button>
+                  <Button 
+                    variant="default" 
+                    className="w-full justify-center rounded-full gap-2 bg-black text-white hover:bg-black/80"
+                    onClick={() => {
+                      navigate('/sign-up');
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <UserPlus size={16} />
+                    Sign up
+                  </Button>
+                </SignedOut>
+              </>
+            ) : (
+              // Non-auth version of buttons for mobile
               <Button 
                 variant="ghost" 
                 className="w-full justify-center rounded-full gap-2"
@@ -172,41 +247,7 @@ const Navbar = () => {
                 <User size={16} />
                 Profile
               </Button>
-              <Button 
-                variant="outline" 
-                className="w-full justify-center rounded-full"
-                onClick={() => {
-                  handleSignOut();
-                  setIsMenuOpen(false);
-                }}
-              >
-                Sign out
-              </Button>
-            </SignedIn>
-            <SignedOut>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-center rounded-full gap-2"
-                onClick={() => {
-                  navigate('/sign-in');
-                  setIsMenuOpen(false);
-                }}
-              >
-                <LogIn size={16} />
-                Log in
-              </Button>
-              <Button 
-                variant="default" 
-                className="w-full justify-center rounded-full gap-2 bg-black text-white hover:bg-black/80"
-                onClick={() => {
-                  navigate('/sign-up');
-                  setIsMenuOpen(false);
-                }}
-              >
-                <UserPlus size={16} />
-                Sign up
-              </Button>
-            </SignedOut>
+            )}
           </div>
         </div>
       </div>
