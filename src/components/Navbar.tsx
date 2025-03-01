@@ -122,16 +122,25 @@ const Navbar = () => {
               </SignedOut>
             </>
           ) : (
-            // Non-auth version of buttons
+            // Non-auth version of buttons - updating to direct to sign-in and sign-up routes
             <>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 className="gap-2 rounded-full text-sm font-medium transition-all hover:bg-gray-100"
-                onClick={() => navigate('/profile')}
+                onClick={() => navigate('/sign-in')}
               >
-                <User size={16} />
-                Profile
+                <LogIn size={16} />
+                Log in
+              </Button>
+              <Button 
+                variant="default" 
+                size="sm" 
+                className="gap-2 rounded-full bg-black text-white hover:bg-black/80 text-sm font-medium transition-all"
+                onClick={() => navigate('/sign-up')}
+              >
+                <UserPlus size={16} />
+                Sign up
               </Button>
             </>
           )}
@@ -235,18 +244,31 @@ const Navbar = () => {
                 </SignedOut>
               </>
             ) : (
-              // Non-auth version of buttons for mobile
-              <Button 
-                variant="ghost" 
-                className="w-full justify-center rounded-full gap-2"
-                onClick={() => {
-                  navigate('/profile');
-                  setIsMenuOpen(false);
-                }}
-              >
-                <User size={16} />
-                Profile
-              </Button>
+              // Non-auth version of buttons for mobile - updating to direct to sign-in and sign-up routes
+              <>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-center rounded-full gap-2"
+                  onClick={() => {
+                    navigate('/sign-in');
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  <LogIn size={16} />
+                  Log in
+                </Button>
+                <Button 
+                  variant="default" 
+                  className="w-full justify-center rounded-full gap-2 bg-black text-white hover:bg-black/80"
+                  onClick={() => {
+                    navigate('/sign-up');
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  <UserPlus size={16} />
+                  Sign up
+                </Button>
+              </>
             )}
           </div>
         </div>
